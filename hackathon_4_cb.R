@@ -6,6 +6,7 @@ library(sentimentr)
 library(magrittr)
 library(caret)
 library(lubridate)
+library(pbapply)
 
 # import the data
 train <- read_csv("data/hackathon_4_train.csv")
@@ -36,6 +37,14 @@ train$tweet_location <- train$tweet_location %>%
 test$tweet_location <- test$tweet_location %>%
   iconv("UTF-8", "UTF-8", sub='')
 
+# let's to lower everything worth tolowering
+train$description %<>% tolower()
+train$name %<>% tolower()
+train$text %<>% tolower()
+test$description %<>% tolower()
+test$name %<>% tolower()
+test$text %<>% tolower()
+
 # these are some terrible functions to check a list against a list for grepl
 boy_count <- function(name) {
   boy_sum <- 0
@@ -57,3 +66,13 @@ girl_count <- function(name) {
   return(girl_sum)
 }
 
+# run these functions to get girl and boy counts 
+# this is crap and takes ages
+train$boy_name <- pblapply(train$name, boy_count)
+train$boy_name <- unlist(train$boy_name)
+train$girl_name <- pblapply(train$name, girl_count)
+train$girl_name <- unlist(train$girl_name)
+test$boy_name <- pblapply(test$name, boy_count)
+test$boy_name <- unlist(test$boy_name)
+test$girl_name <- pblapply(test$name, girl_count)
+test$girl_name <- unlist(test$girl_name)
