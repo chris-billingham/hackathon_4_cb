@@ -47,28 +47,24 @@ test$text %<>% tolower()
 
 # these are some terrible functions to check a list against a list for grepl
 boy_count <- function(name) {
-  boy_sum <- 0
-  for (i in 1:nrow(boy)) {
-    value <- grepl(boy$name[i], name)
-    boy_sum <- boy_sum + value
-  }
+  boy_sum <- boy$name %>%
+    map_int(~grepl(.x, name)) %>%
+    sum()
   boy_sum <- boy_sum/nrow(boy)
   return(boy_sum)
 }
 
 girl_count <- function(name) {
-  girl_sum <- 0
-  for (i in 1:nrow(girl)) {
-    value <- grepl(girl$name[i], name)
-    girl_sum <- girl_sum + value
-  }
+  girl_sum <- girl$name %>%
+    map_int(~grepl(.x, name)) %>%
+    sum()
   girl_sum <- girl_sum/nrow(girl)
   return(girl_sum)
 }
 
 # run these functions to get girl and boy counts 
 # this is crap and takes ages
-train$boy_name <- pblapply(train$name, boy_count)
+train$boy_name <- pblapply(train$name, boy_count2)
 train$boy_name <- unlist(train$boy_name)
 train$girl_name <- pblapply(train$name, girl_count)
 train$girl_name <- unlist(train$girl_name)
